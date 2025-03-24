@@ -1,0 +1,66 @@
+
+services:
+  access-gatekeeper:
+    build: ./access-gatekeeper
+    ports:
+      - "5100:5100"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  critter-core-1:
+    build: ./critter-core
+    ports:
+      - "5201:5200"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5201/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  critter-core-2:
+    build: ./critter-core
+    ports:
+      - "5202:5200"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5202/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  xp-tracker:
+    build: ./xp-tracker
+    ports:
+      - "5300:5300"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5300/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  command-router:
+    build: ./command-router
+    ports:
+      - "8000:8000"
+    depends_on:
+      - access-gatekeeper
+      - critter-core-1
+      - critter-core-2
+      - xp-tracker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  pet-portal:
+    build: ./pet-portal
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
